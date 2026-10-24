@@ -88,7 +88,7 @@ namespace Huarui.STARLine
             Container[] cnts = new Container[size];
             for (int i = 0; i < size; i++)
             {
-                if (Current + i >= 1 && Current + i < End)
+                if (Current >= 1 && Current + i <= End)
                     cnts[i] = this[Current + i - 1];
                 else
                     cnts[i] = null;
@@ -106,7 +106,7 @@ namespace Huarui.STARLine
             for (int i = 0; i < cnts.Length; i++) cnts[i] = null;
             for (int i = 0; i < Math.Min(size, cnts.Length); i++)
             {
-                if (Current + i >= 1 && Current + i < End)
+                if (Current >= 1 && Current + i <= End)
                     cnts[i] = this[Current + i - 1];
                 else
                     cnts[i] = null;
@@ -121,7 +121,7 @@ namespace Huarui.STARLine
             if (cnts == null) return;
             for (int i = 0; i < cnts.Length; i++)
             {
-                if (Current + i >= 1 && Current + i < End)
+                if (Current >= 1 && Current + i <= End)
                     cnts[i] = this[Current + i - 1];
                 else
                     cnts[i] = null;

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="FixtureContainer.cs" />
+    <Compile Include="../../src/STARLine/Deck/ContainerSequence.cs" Link="Production/ContainerSequence.cs" />
+    <Compile Include="../../src/STARLine/StepReturn/StepResult.cs" Link="Production/StepResult.cs" />
+    <Compile Include="../../src/STARLine/StepReturn/StepResultErrorFlag.cs" Link="Production/StepResultErrorFlag.cs" />
+    <Compile Include="../../src/STARLine/Error/RecoveryAction.cs" Link="Production/RecoveryAction.cs" />
+  </ItemGroup>
+</Project>
