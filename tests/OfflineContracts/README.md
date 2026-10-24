@@ -1,8 +1,8 @@
 # Offline source contracts
 
-This console harness links four unchanged production source files. It tests sequence boundaries and synthetic result decoding without loading the full STARLine assembly. The empty `Container` fixture provides identity only; the sequence does not use any container members. No Hamilton runtime, COM activation, UI, configuration access, or device connection is part of this project.
+This console harness links four production source files, including the corrected `ContainerSequence`. It tests sequence boundaries and synthetic result decoding without loading the full STARLine assembly. The empty `Container` fixture provides identity only; the sequence does not use any container members. No Hamilton runtime, COM activation, UI, configuration access, or device connection is part of this project.
 
-The inclusive sequence contract follows `Current` accepting `End`, the `PositionsLeft = End - Current + 1` calculation, and `Increment` exhausting only after `End`. Independently expected identity indices exercise all three `Get` overloads, including a single item, the final item, and a bounded subrange. `-1` in observations denotes a null output slot. Decoder literals are synthetic, not historical firmware evidence.
+The inclusive sequence contract follows `Current` accepting `End`, the `PositionsLeft = End - Current + 1` calculation, and `Increment` exhausting only after `End`. Independently expected identity indices exercise all three `Get` overloads, including a single item, the final item, and a bounded subrange. `-1` in observations denotes null; `-2` denotes a foreign container, so an uncleared prefilled destination cannot look like a cleared slot. Decoder literals are synthetic, not historical firmware evidence.
 
 Use the installed audit-local .NET 8 SDK. Restore uses this project's empty NuGet source list and an isolated package directory. Wrap each command in the toolkit watchdog (timeout 180 seconds, idle 45 seconds):
 

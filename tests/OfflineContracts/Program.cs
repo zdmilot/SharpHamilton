@@ -50,6 +50,7 @@ internal static class Program
             test_id = id, utility = "SharpHamilton", revision,
             test_input = new { kind = "synthetic", fixture = input, sha256 = Hash(Encoding.UTF8.GetBytes(Json(input))) },
             expected_outcome = expected, actual_outcome = actual, verdict = pass ? "PASS" : "FAIL",
+            expected, actual, elapsed_ms = timer.Elapsed.TotalMilliseconds,
             execution_ms = timer.Elapsed.TotalMilliseconds,
             cpu_ms = (process.TotalProcessorTime - cpuBefore).TotalMilliseconds,
             peak_memory_bytes = process.PeakWorkingSet64,
@@ -70,7 +71,7 @@ internal static class Program
     }
     private static int[] Indices(ContainerSequence seq, Container[] items)
     {
-        return items.Select(item => item == null ? -1 : seq.IndexOf(item)).ToArray();
+        return items.Select(item => item == null ? -1 : seq.IndexOf(item) < 0 ? -2 : seq.IndexOf(item)).ToArray();
     }
     private static Container[] Get(ContainerSequence seq, int mode, int size)
     {
@@ -103,7 +104,19 @@ internal static class Program
             Check("sequence.invalid-current.get-" + mode, new { count = 3, current = 0, size = 5, overload }, new[] { -1, -1, -1, -1, -1 }, () => {
                 var seq = Sequence(3); seq.Current = 0; return Indices(seq, Get(seq, overload, 5));
             });
+            Check("sequence.end-before-current.get-" + mode, new { count = 3, current = 3, end = 2, overload }, new[] { -1, -1 }, () => {
+                var seq = Sequence(3); seq.Current = 3; seq.End = 2;
+                if (seq.Current != -1) throw new InvalidOperationException("Current must expose exhausted sentinel");
+                return Indices(seq, Get(seq, overload, 2));
+            });
+            Check("sequence.final-tail-cleared.get-" + mode, new { count = 3, current = 3, end = 3, size = 2, overload }, new[] { 2, -1 }, () => {
+                var seq = Sequence(3); seq.Current = 3; return Indices(seq, Get(seq, overload, 2));
+            });
+            Check("sequence.zero-size.get-" + mode, new { count = 3, size = 0, overload }, Array.Empty<int>(), () => {
+                var seq = Sequence(3); return Indices(seq, Get(seq, overload, 0));
+            });
         }
+        Check("harness.foreign-sentinel-distinct-from-null", "one null and one foreign container", new[] { -1, -2 }, () => Indices(Sequence(1), new Container[] { null, new Container() }));
         Check("sequence.single.inclusive-state", new { count = 1 }, new { current = 1, end = 1, positions_left = 1 }, () => State(Sequence(1)));
         Check("sequence.subrange.inclusive-state", new { count = 4, current = 2, end = 3 }, new { current = 2, end = 3, positions_left = 2 }, () => {
             var seq = Sequence(4); seq.End = 3; seq.Current = 2; return State(seq);
@@ -171,6 +184,10 @@ internal static class Program
             source_hashes = before, source_hashes_after = after,
             fixture_kind = "synthetic", started = started.ToString("O"), completed = DateTimeOffset.UtcNow.ToString("O"),
             total_tests = Records.Count, passing = Records.Count - failed, failing = failed, execution_ms = total.Elapsed.TotalMilliseconds,
+            tests_executed = Records.Count, verdict = failed == 0 ? "PASS" : "FAIL",
+            elapsed_ms = total.Elapsed.TotalMilliseconds,
+            assembly = new { path = System.Reflection.Assembly.GetExecutingAssembly().Location,
+                sha256 = Hash(File.ReadAllBytes(System.Reflection.Assembly.GetExecutingAssembly().Location)) },
             exit_code = exitCode, records = Records,
             limitations = new[] {
                 "Tests compile the four linked production sources, not the complete .NET Framework/COM application.",
